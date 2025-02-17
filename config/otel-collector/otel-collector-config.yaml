@@ -10,6 +10,18 @@ processors:
   batch:
 
 exporters:
+  otlp:
+    endpoint: otel-collector:4317
+    tls:
+      insecure: true
+  otlp/jaeger:
+    endpoint: "http://jaeger:4317"
+    tls:
+      insecure: true
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
   prometheusremotewrite:
     endpoint: "http://load-balancer:9009/api/v1/push"
     tls:
@@ -26,4 +38,8 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheusremotewrite, debug]
+      exporters: [prometheusremotewrite, debug, otlp]
+    traces: 
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/jaeger, otlp/tempo]
